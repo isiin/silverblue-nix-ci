@@ -29,6 +29,7 @@ jobs:
           echo "$REG_PASS" | buildah login -u "$REG_USER" "$REG_NAME" --password-stdin
           buildah build \
             --format=oci \
+            --layers \
             --label quay.expires-after=90d \
             --cache-from "$IMAGE_BASE:cache" \
             --cache-to "$IMAGE_BASE:cache" \
