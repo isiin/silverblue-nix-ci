@@ -23,6 +23,7 @@ jobs:
           REG_USER: "isiin"
           REG_PASS: ${{ secrets.REG_PASS }}
           IMAGE_BASE: "quay.io/isiin/silverblue-nix"
+          CACHE_BASE: "quay.io/isiin/silverblue-nix-cache"
         run: |
           BUILD_DATE=$(date +%Y%m%d)
           cd workspace
@@ -31,10 +32,14 @@ jobs:
             --format=oci \
             --layers \
             --label quay.expires-after=90d \
-            --cache-from "$IMAGE_BASE:cache" \
-            --cache-to "$IMAGE_BASE:cache" \
+            --cache-from "$CACHE_BASE" \
+            --cache-to "$CACHE_BASE" \
             --tag="$IMAGE_BASE:latest" \
-            --tag="$IMAGE_BASE:$BUILD_DATE" \
             .
           buildah push --compression-format=zstd:chunked "$IMAGE_BASE:latest"
-          buildah push --compression-format=zstd:chunked "$IMAGE_BASE:$BUILD_DATE"
+          scopeo copy \
+            --src-creds "$REG_USER:$REG_PASS" \
+            --dest-creds "$REG_USER:$REG_PASS" \
+            docker://$IMAGE_BASE:latest" \
+            docker://$IMAGE_BASE:$BUILD_DATE"
+
