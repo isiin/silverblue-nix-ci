@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  # runs at JST0:00 on Sundays
+  schedule:
+    - cron: "0 15 * * 6"
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        env:
+          GL_TOKEN: ${{ secrets.GL_TOKEN }}
+        run: git clone --depth=1 "https://oauth2:$GL_TOKEN@gitlab.com/isiin/silverblue-nix.git" workspace
+
+      - name: Build
+        env:
+          REG_NAME: "quay.io"
+          REG_USER: "isiin"
+          REG_PASS: ${{ secrets.REG_PASS }}
+          IMAGE_BASE: "quay.io/isiin/silverblue-nix"
+        run: |
+          BUILD_DATE=$(date +%Y%m%d)
+          cd workspace
+          echo "$REG_PASS" | buildah login -u "$REG_USER" "$REG_NAME" --password-stdin
+          buildah build --format=oci --label quay.expires-after=90d -t "$IMAGE_BASE:latest" -t "$IMAGE_BASE:$BUILD_DATE"
+          buildah push --compression-format=zstd:chunked "$IMAGE_BASE:latest"
+          buildah push --compression-format=zstd:chunked "$IMAGE_BASE:$BUILD_DATE"
