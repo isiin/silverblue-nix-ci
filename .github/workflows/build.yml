@@ -37,7 +37,8 @@ jobs:
             --tag="$IMAGE_BASE:latest" \
             .
           buildah push --compression-format=zstd:chunked "$IMAGE_BASE:latest"
-          scopeo copy \
+          skopeo copy \
+            --format=oci \
             --src-creds "$REG_USER:$REG_PASS" \
             --dest-creds "$REG_USER:$REG_PASS" \
             docker://$IMAGE_BASE:latest" \
