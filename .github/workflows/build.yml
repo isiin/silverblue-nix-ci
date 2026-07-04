@@ -30,9 +30,10 @@ jobs:
           buildah build \
             --format=oci \
             --label quay.expires-after=90d \
-            --cache-from "$IMAGE_BASE:cache"
-            --cache-to "$IMAGE_BASE:cache"
+            --cache-from "$IMAGE_BASE:cache" \
+            --cache-to "$IMAGE_BASE:cache" \
             --tag="$IMAGE_BASE:latest" \
-            --tag="$IMAGE_BASE:$BUILD_DATE"
+            --tag="$IMAGE_BASE:$BUILD_DATE" \
+            .
           buildah push --compression-format=zstd:chunked "$IMAGE_BASE:latest"
           buildah push --compression-format=zstd:chunked "$IMAGE_BASE:$BUILD_DATE"
