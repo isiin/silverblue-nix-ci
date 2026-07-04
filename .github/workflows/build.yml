@@ -27,6 +27,12 @@ jobs:
           BUILD_DATE=$(date +%Y%m%d)
           cd workspace
           echo "$REG_PASS" | buildah login -u "$REG_USER" "$REG_NAME" --password-stdin
-          buildah build --format=oci --label quay.expires-after=90d -t "$IMAGE_BASE:latest" -t "$IMAGE_BASE:$BUILD_DATE"
+          buildah build \
+            --format=oci \
+            --label quay.expires-after=90d \
+            --cache-from "$IMAGE_BASE:cache"
+            --cache-to "$IMAGE_BASE:cache"
+            --tag="$IMAGE_BASE:latest" \
+            --tag="$IMAGE_BASE:$BUILD_DATE"
           buildah push --compression-format=zstd:chunked "$IMAGE_BASE:latest"
           buildah push --compression-format=zstd:chunked "$IMAGE_BASE:$BUILD_DATE"
