@@ -34,13 +34,13 @@ jobs:
             --label quay.expires-after=90d \
             --cache-from "$CACHE_BASE" \
             --cache-to "$CACHE_BASE" \
-            --tag="$IMAGE_BASE:latest" \
+            --tag="$IMAGE_BASE:BUILD_DATE" \
             .
-          buildah push --compression-format=zstd:chunked "$IMAGE_BASE:latest"
+          buildah push --compression-format=zstd:chunked "$IMAGE_BASE:BUILD_DATE"
           skopeo copy \
             --format=oci \
             --src-creds "$REG_USER:$REG_PASS" \
             --dest-creds "$REG_USER:$REG_PASS" \
-            docker://"$IMAGE_BASE:latest" \
-            docker://"$IMAGE_BASE:$BUILD_DATE"
+            docker://"$IMAGE_BASE:$BUILD_DATE" \
+            docker://"$IMAGE_BASE:latest"
 
