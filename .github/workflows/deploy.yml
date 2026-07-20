@@ -1,4 +1,4 @@
-name: CI
+name: CD
 
 on:
   # runs at JST0:00 on Sundays
