@@ -17,6 +17,18 @@ jobs:
           GL_TOKEN: ${{ secrets.GL_TOKEN }}
         run: git clone --depth=1 "https://oauth2:$GL_TOKEN@gitlab.com/isiin/silverblue-nix.git" workspace
 
+      - name: Prepare storage permissions
+        run: |
+          sudo mkdir -p /var/lib/containers
+          sudo chown -R $USER /var/lib/containers
+
+      - name: Cache Podman storage
+        uses: actions/cache@v6
+          with:
+            path: /var/lib/containers
+            key: podman-containers-${{ runner.os }}-${{ github.run_id }}
+            restore-keys: podman-containers-${{ runner.os }}-
+
       - name: Deploy
         env:
           REG_PASS: ${{ secrets.REG_PASS }}
