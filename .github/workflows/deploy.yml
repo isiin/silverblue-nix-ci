@@ -17,30 +17,10 @@ jobs:
           GL_TOKEN: ${{ secrets.GL_TOKEN }}
         run: git clone --depth=1 "https://oauth2:$GL_TOKEN@gitlab.com/isiin/silverblue-nix.git" workspace
 
-      - name: Build
+      - name: Deploy
         env:
-          REG_NAME: "quay.io"
-          REG_USER: "isiin"
           REG_PASS: ${{ secrets.REG_PASS }}
-          IMAGE_BASE: "quay.io/isiin/silverblue-nix"
-          CACHE_BASE: "quay.io/isiin/silverblue-nix-cache"
         run: |
-          BUILD_DATE=$(date +%Y%m%d)
           cd workspace
-          echo "$REG_PASS" | buildah login -u "$REG_USER" "$REG_NAME" --password-stdin
-          buildah build \
-            --format=oci \
-            --layers \
-            --label quay.expires-after=90d \
-            --cache-from "$CACHE_BASE" \
-            --cache-to "$CACHE_BASE" \
-            --tag="$IMAGE_BASE:$BUILD_DATE" \
-            .
-          buildah push --compression-format=zstd:chunked "$IMAGE_BASE:$BUILD_DATE"
-          skopeo copy \
-            --format=oci \
-            --src-creds "$REG_USER:$REG_PASS" \
-            --dest-creds "$REG_USER:$REG_PASS" \
-            docker://"$IMAGE_BASE:$BUILD_DATE" \
-            docker://"$IMAGE_BASE:latest"
+          sudo REG_PASS="$REG_PASS" ./deploy.sh
 
