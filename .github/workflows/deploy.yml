@@ -39,6 +39,5 @@ jobs:
       - name: Fix storage permissions for cache
         if: always()
         run: |
-          sudo podman system prune -f || true
           sudo chmod -R a+rwX /var/lib/containers
 
