@@ -1,9 +1,9 @@
 name: CD
 
 on:
-  # runs at JST0:00 on Wednesdays and Sundays
+  # runs at JST0:00 on Sundays
   schedule:
-    - cron: "0 15 * * 2,6"
+    - cron: "0 15 * * 6"
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -17,27 +17,10 @@ jobs:
           GL_TOKEN: ${{ secrets.GL_TOKEN }}
         run: git clone --depth=1 "https://oauth2:$GL_TOKEN@gitlab.com/isiin/silverblue-nix.git" workspace
 
-      - name: Prepare storage permissions for cache
-        run: |
-          sudo mkdir -p /var/lib/containers
-          sudo chown -R $USER:$USER /var/lib/containers
-
-      - name: Cache Podman storage
-        uses: actions/cache@v6
-        with:
-          path: /var/lib/containers
-          key: podman-containers-${{ runner.os }}-${{ github.run_id }}
-          restore-keys: podman-containers-${{ runner.os }}-
-
       - name: Deploy
         env:
           REG_PASS: ${{ secrets.REG_PASS }}
         run: |
           cd workspace
           sudo REG_PASS="$REG_PASS" ./deploy.sh
-
-      - name: Fix storage permissions for cache
-        if: always()
-        run: |
-          sudo chmod -R a+rwX /var/lib/containers
 
