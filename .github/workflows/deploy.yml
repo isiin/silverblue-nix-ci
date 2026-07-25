@@ -24,10 +24,10 @@ jobs:
 
       - name: Cache Podman storage
         uses: actions/cache@v6
-          with:
-            path: /var/lib/containers
-            key: podman-containers-${{ runner.os }}-${{ github.run_id }}
-            restore-keys: podman-containers-${{ runner.os }}-
+        with:
+          path: /var/lib/containers
+          key: podman-containers-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: podman-containers-${{ runner.os }}-
 
       - name: Deploy
         env:
