@@ -17,17 +17,14 @@ jobs:
           GL_TOKEN: ${{ secrets.GL_TOKEN }}
         run: git clone --depth=1 "https://oauth2:$GL_TOKEN@gitlab.com/isiin/silverblue-nix.git" workspace
 
-      - name: Podman login rootful
+      - name: Podman login
         env:
           REG_PASS: ${{ secrets.REG_PASS }}
         run: |
-          sudo mkdir -p /root/.config/containers
-          echo "$REG_PASS" | sudo podman login --password-stdin \
-            --authfile='/root/.config/containers/auth.json' \
-            -u isiin quay.io
+          echo "$REG_PASS" | sudo podman login --password-stdin -u isiin quay.io
 
       - name: Deploy
         run: |
           cd workspace
-          sudo ./deploy.sh
+          ./deploy.sh
 
