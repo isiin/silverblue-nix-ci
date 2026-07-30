@@ -12,11 +12,6 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     steps:
-      - name: Test
-        run: |
-          df -h
-          sudo mount -o remount,size=8G /dev/shm
-
       - name: Checkout
         env:
           GL_TOKEN: ${{ secrets.GL_TOKEN }}
