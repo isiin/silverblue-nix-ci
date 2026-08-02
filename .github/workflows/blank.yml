@@ -21,7 +21,7 @@ jobs:
         run: |
           podman -v
           skopeo -v
-          apt-get install -y podman skopeo
+          sudo apt-get install -y podman skopeo
           podman -v
           skopeo -v
           
