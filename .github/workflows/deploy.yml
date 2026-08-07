@@ -8,28 +8,32 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+env:
+  REGISTRY_AUTH_FILE: "/tmp/auth.json"
+
 jobs:
   build-and-push:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       - name: Checkout
         env:
           GL_TOKEN: ${{ secrets.GL_TOKEN }}
         run: git clone --depth=1 "https://oauth2:$GL_TOKEN@gitlab.com/isiin/silverblue-nix.git" workspace
 
+      - name: Podman version
+        run: podman --version
+
       - name: Podman login
         env:
           REG_NAME: "quay.io"
           REG_USER: ${{ github.actor }}
           REG_PASS: ${{ secrets.REG_PASS }}
-          AUTHFILE: "/tmp/auth.json"
         run: |
-          echo "$REG_PASS" | podman login --password-stdin \
-            --authfile="$AUTHFILE" -u "$REG_USER" "$REG_NAME"
-          echo "REGISTRY_AUTH_FILE=$AUTHFILE" >> $GITHUB_ENV
+          echo "$REG_PASS" | sudo podman login --password-stdin \
+            --authfile="$REGISTRY_AUTH_FILE" -u "$REG_USER" "$REG_NAME"
 
       - name: Deploy
         run: |
           cd workspace
-          sudo -E ./deploy.sh
+          sudo REGISTRY_AUTH_FILE="$REGISTRY_AUTH_FILE" ./deploy.sh
 
